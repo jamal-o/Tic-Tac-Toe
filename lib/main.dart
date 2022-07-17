@@ -36,10 +36,13 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+typedef UnCallback = Function();
+
 class _HomePageState extends State<HomePage> {
   static const IconData empty = Icons.check_box_outline_blank;
   static const IconData x = Icons.cancel_presentation;
   static const IconData o = Icons.circle;
+  //final UnCallback uf; uf= (() {});
   var status_squares = [
     [empty, empty, empty],
     [empty, empty, empty],
@@ -62,64 +65,160 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Container(
-          height: 100.00,
-          child: Row(
-            children: [
-              //Row 0
-
-              Column(children: [
-                Icon(
-                  status_squares[0][0],
-                  size: 100.00,
+      appBar: AppBar(
+        title: Text('Tic Tac Toe'),
+      ),
+      body: Center(
+        child: Container(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Box(), Box(), Box()],
                 ),
-                Icon(
-                  status_squares[0][1],
-                  size: 100.00,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Box(), Box(), Box()],
                 ),
-                Icon(
-                  status_squares[0][2],
-                  size: 100.00,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Box(), Box(), Box()],
+                ),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: (() => print('gesture detected')),
+                      child: Container(
+                        child: Text('Elelvated Button'),
+                      ),
+                    )
+                  ],
                 )
-              ]),
+              ],
+            )
 
-              //Row 1
-              Column(
-                children: [
+            /* Row(
+              children: [
+                //Row 0
+
+                Column(children: [
                   Icon(
-                    status_squares[1][0],
+                    status_squares[0][0],
                     size: 100.00,
                   ),
                   Icon(
-                    status_squares[1][1],
+                    status_squares[0][1],
                     size: 100.00,
                   ),
                   Icon(
-                    status_squares[1][2],
+                    status_squares[0][2],
                     size: 100.00,
                   )
-                ],
-              ),
+                ]),
 
-              //Row 2
-              Column(children: [
-                Icon(
-                  status_squares[2][0],
-                  size: 100.00,
+                //Row 1
+                Column(
+                  children: [
+                    Icon(
+                      status_squares[1][0],
+                      size: 100.00,
+                    ),
+                    Icon(
+                      status_squares[1][1],
+                      size: 100.00,
+                    ),
+                    Icon(
+                      status_squares[1][2],
+                      size: 100.00,
+                    )
+                  ],
                 ),
-                Icon(
-                  status_squares[2][1],
-                  size: 100.00,
-                ),
-                Icon(
-                  status_squares[2][2],
-                  size: 100.00,
-                ),
-              ]),
-            ],
-          )),
-      floatingActionButton: Icon(Icons.restart_alt_outlined),
+
+                //Row 2
+                Column(children: [
+                  Icon(
+                    status_squares[2][0],
+                    size: 100.00,
+                  ),
+                  Icon(
+                    status_squares[2][1],
+                    size: 100.00,
+                  ),
+                  Icon(
+                    status_squares[2][2],
+                    size: 100.00,
+                  ),
+                ]),
+              ],
+            ) */
+            ),
+      ),
+      floatingActionButton: IconButton(
+        icon: Icon(
+          Icons.restart_alt_outlined,
+        ),
+        onPressed: () {},
+      ),
+    );
+  }
+}
+
+int count = 0;
+
+class Box extends StatefulWidget {
+  Box({Key? key, int? this.status}) : super(key: key);
+
+  final int? status;
+  List<int> arr = [1, 2, 3];
+  final mp = <int>{};
+
+  @override
+  State<Box> createState() => _BoxState();
+}
+
+class _BoxState extends State<Box> {
+  int status = 1;
+
+  final iconlist = DefaultTextStyle.merge(
+      style: TextStyle(fontWeight: FontWeight.bold), child: Container());
+
+  void _update() {
+    setState(() {
+      if (value == ' ') {
+        if (count.isEven) {
+          value = 'X';
+          xo = false;
+        } else {
+          value = 'O';
+          xo = true;
+        }
+        count++;
+      } else {
+        widget.arr.map((e) => print(e));
+      }
+    });
+  }
+
+  String value = ' ';
+  bool xo = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: _update,
+      child: Container(
+        height: 50,
+        width: 50,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.black,
+            width: 2.00,
+          ),
+        ),
+        child: Center(child: SizedBox(child: Text(value))),
+      ),
     );
   }
 }
