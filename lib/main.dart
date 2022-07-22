@@ -4,6 +4,8 @@ void main() {
   runApp(const MyApp());
 }
 
+int count = 1;
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -11,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Tic Tac Toe',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -36,34 +38,113 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-typedef UnCallback = Function();
-
 class _HomePageState extends State<HomePage> {
-  static const IconData empty = Icons.check_box_outline_blank;
-  static const IconData x = Icons.cancel_presentation;
-  static const IconData o = Icons.circle;
-  //final UnCallback uf; uf= (() {});
-  var status_squares = [
-    [empty, empty, empty],
-    [empty, empty, empty],
-    [empty, empty, empty]
-  ];
+  //int count = 0;
+  List<Box>? boxesList;
+  var filledBoxes = <Box>{};
 
-  Widget tile_builder() {
-    int row = 0, col = 0;
+  createboxList() {
+    boxesList = [
+      Box(updateBox: updateBox, id: 0), //0
+      Box(updateBox: updateBox, id: 1),
+      Box(updateBox: updateBox, id: 2),
+      Box(updateBox: updateBox, id: 3),
+      Box(updateBox: updateBox, id: 4),
+      Box(updateBox: updateBox, id: 5),
+      Box(updateBox: updateBox, id: 6),
+      Box(updateBox: updateBox, id: 7),
+      Box(updateBox: updateBox, id: 8),
+    ];
+  }
 
-    return Row(
-      children: [
-        Icon(
-          status_squares[row][col],
-          size: 100.00,
-        )
-      ],
-    );
+  check() {
+    // if filled boxes contains box 11
+    if (!filledBoxes.contains(boxesList![0])) {
+      if (verticalCheck(boxesList![0])) return true;
+      if (horizontalCheck(boxesList![0])) return true;
+      if (crossCheck(boxesList![0])) return true;
+    }
+
+    // if filled boxes contains box 13
+    if (!filledBoxes.contains(boxesList![2])) {
+      if (verticalCheck(boxesList![2])) return true;
+      if (crossCheck(boxesList![2])) return true;
+    }
+
+    //if filled boxes contains box 21
+    if (!filledBoxes.contains(boxesList![3])) {
+      if (horizontalCheck(boxesList![3])) return true;
+    }
+
+    //if filled boxes contains box 31
+    if (!filledBoxes.contains(boxesList![6])) {
+      if (horizontalCheck(boxesList![6])) return true;
+    }
+
+    //if filled boxes contains box 12
+    if (!filledBoxes.contains(boxesList![1])) {
+      if (verticalCheck(boxesList![3])) return true;
+    }
+
+    //if no pattern was found it will return false
+    return false;
+  }
+
+  verticalCheck(Box boxToBeChecked) {
+    if (boxToBeChecked.value == boxesList![boxToBeChecked.id + 3].value &&
+        boxToBeChecked.value == boxesList![boxToBeChecked.id + 6].value) {
+      return true;
+    }
+  }
+
+  horizontalCheck(Box boxToBeChecked) {
+    if (boxToBeChecked.value == boxesList![boxToBeChecked.id + 1].value &&
+        boxToBeChecked.value == boxesList![boxToBeChecked.id + 2].value) {
+      return true;
+    }
+  }
+
+  crossCheck(Box boxToBeChecked) {
+    //special check for box 11
+    if (boxToBeChecked == boxesList![0]) {
+      if (boxToBeChecked.value == boxesList![4].value &&
+          boxToBeChecked.value == boxesList![8].value) {
+        return true;
+      }
+    }
+
+    // special check for box 13
+    if (boxToBeChecked == boxesList![2]) {
+      if (boxToBeChecked.value == boxesList![4].value &&
+          boxToBeChecked.value == boxesList![6].value) {
+        return true;
+      }
+    }
+  }
+
+  String winner = '';
+  Widget winnerStatus = Text('');
+
+  updateBox() {
+    setState(() {
+      //advance the counter
+
+      count++;
+      //print(count);
+      // check for a solution
+      if (count > 4) {
+        if (check()) {
+          winner = count.isOdd ? 'X' : 'O';
+          winnerStatus = Text('The Winner is $winner!!!!!');
+        }
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    createboxList();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Tic Tac Toe'),
@@ -76,84 +157,21 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Box(), Box(), Box()],
+                  children: [boxesList![0], boxesList![1], boxesList![2]],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Box(), Box(), Box()],
+                  children: [boxesList![3], boxesList![4], boxesList![5]],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Box(), Box(), Box()],
+                  children: [boxesList![6], boxesList![7], boxesList![8]],
                 ),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: (() => print('gesture detected')),
-                      child: Container(
-                        child: Text('Elelvated Button'),
-                      ),
-                    )
-                  ],
-                )
-              ],
-            )
-
-            /* Row(
-              children: [
-                //Row 0
-
-                Column(children: [
-                  Icon(
-                    status_squares[0][0],
-                    size: 100.00,
-                  ),
-                  Icon(
-                    status_squares[0][1],
-                    size: 100.00,
-                  ),
-                  Icon(
-                    status_squares[0][2],
-                    size: 100.00,
-                  )
-                ]),
-
-                //Row 1
-                Column(
-                  children: [
-                    Icon(
-                      status_squares[1][0],
-                      size: 100.00,
-                    ),
-                    Icon(
-                      status_squares[1][1],
-                      size: 100.00,
-                    ),
-                    Icon(
-                      status_squares[1][2],
-                      size: 100.00,
-                    )
-                  ],
-                ),
-
-                //Row 2
-                Column(children: [
-                  Icon(
-                    status_squares[2][0],
-                    size: 100.00,
-                  ),
-                  Icon(
-                    status_squares[2][1],
-                    size: 100.00,
-                  ),
-                  Icon(
-                    status_squares[2][2],
-                    size: 100.00,
-                  ),
+                Row(children: [
+                  winnerStatus,
                 ]),
               ],
-            ) */
-            ),
+            )),
       ),
       floatingActionButton: IconButton(
         icon: Icon(
@@ -165,49 +183,46 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-int count = 0;
-
+// ignore: must_be_immutable
 class Box extends StatefulWidget {
-  Box({Key? key, int? this.status}) : super(key: key);
+  Box({Key? key, required this.updateBox, required this.id}) : super(key: key);
 
-  final int? status;
-  List<int> arr = [1, 2, 3];
-  final mp = <int>{};
+  int id;
+  String value = '';
+  final Function updateBox;
 
   @override
   State<Box> createState() => _BoxState();
 }
 
 class _BoxState extends State<Box> {
-  int status = 1;
-
   final iconlist = DefaultTextStyle.merge(
       style: TextStyle(fontWeight: FontWeight.bold), child: Container());
 
-  void _update() {
-    setState(() {
-      if (value == ' ') {
-        if (count.isEven) {
-          value = 'X';
-          xo = false;
-        } else {
-          value = 'O';
-          xo = true;
-        }
-        count++;
+  void _playTurn() {
+    if (widget.value == '') {
+      if (count.isOdd) {
+        widget.value = 'X';
       } else {
-        widget.arr.map((e) => print(e));
+        widget.value = 'O';
       }
-    });
+    }
+
+    widget.updateBox();
   }
 
-  String value = ' ';
+  //String value = '';
+
   bool xo = true;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: _update,
+      onTap: (() {
+        setState(() {
+          _playTurn();
+        });
+      }),
       child: Container(
         height: 50,
         width: 50,
@@ -217,7 +232,7 @@ class _BoxState extends State<Box> {
             width: 2.00,
           ),
         ),
-        child: Center(child: SizedBox(child: Text(value))),
+        child: Center(child: SizedBox(child: Text(widget.value))),
       ),
     );
   }
