@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
+      //home: Text('id'),
       home: const HomePage(),
     );
   }
@@ -39,7 +40,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //int count = 0;
   List<Box>? boxesList;
   var filledBoxes = <Box>{};
 
@@ -59,30 +59,30 @@ class _HomePageState extends State<HomePage> {
 
   check() {
     // if filled boxes contains box 11
-    if (!filledBoxes.contains(boxesList![0])) {
+    if (filledBoxes.contains(boxesList![0])) {
       if (verticalCheck(boxesList![0])) return true;
       if (horizontalCheck(boxesList![0])) return true;
       if (crossCheck(boxesList![0])) return true;
     }
 
     // if filled boxes contains box 13
-    if (!filledBoxes.contains(boxesList![2])) {
+    if (filledBoxes.contains(boxesList![2])) {
       if (verticalCheck(boxesList![2])) return true;
       if (crossCheck(boxesList![2])) return true;
     }
 
     //if filled boxes contains box 21
-    if (!filledBoxes.contains(boxesList![3])) {
+    if (filledBoxes.contains(boxesList![3])) {
       if (horizontalCheck(boxesList![3])) return true;
     }
 
     //if filled boxes contains box 31
-    if (!filledBoxes.contains(boxesList![6])) {
+    if (filledBoxes.contains(boxesList![6])) {
       if (horizontalCheck(boxesList![6])) return true;
     }
 
     //if filled boxes contains box 12
-    if (!filledBoxes.contains(boxesList![1])) {
+    if (filledBoxes.contains(boxesList![1])) {
       if (verticalCheck(boxesList![3])) return true;
     }
 
@@ -91,6 +91,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   verticalCheck(Box boxToBeChecked) {
+    if (boxesList![boxToBeChecked.id + 3] == null ||
+        boxesList![boxToBeChecked.id + 6] == null) {
+      return false;
+    }
     if (boxToBeChecked.value == boxesList![boxToBeChecked.id + 3].value &&
         boxToBeChecked.value == boxesList![boxToBeChecked.id + 6].value) {
       return true;
@@ -122,17 +126,30 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  String winner = '';
+  String? winner = '';
   Widget winnerStatus = Text('');
 
-  updateBox() {
+  updateBox(int id) {
     setState(() {
+      if (boxesList![id].value == '') {
+        // Add it to list of filled boxes
+        filledBoxes.add(boxesList![id]);
+
+        if (count.isOdd) {
+          boxesList![id].value = 'X';
+        } else {
+          boxesList![id].value = 'O';
+        }
+      }
+
+      //widget.updateBox();
+
       //advance the counter
 
       count++;
-      //print(count);
+      print(count);
       // check for a solution
-      if (count > 4) {
+      if (count > 5) {
         if (check()) {
           winner = count.isOdd ? 'X' : 'O';
           winnerStatus = Text('The Winner is $winner!!!!!');
@@ -200,15 +217,9 @@ class _BoxState extends State<Box> {
       style: TextStyle(fontWeight: FontWeight.bold), child: Container());
 
   void _playTurn() {
-    if (widget.value == '') {
-      if (count.isOdd) {
-        widget.value = 'X';
-      } else {
-        widget.value = 'O';
-      }
-    }
+    //setState(() {});
 
-    widget.updateBox();
+    widget.updateBox(widget.id);
   }
 
   //String value = '';
@@ -217,12 +228,26 @@ class _BoxState extends State<Box> {
 
   @override
   Widget build(BuildContext context) {
+    // return Container(
+    //   height: 50,
+    //   width: 50,
+    //   decoration: BoxDecoration(
+    //     border: Border.all(
+    //       color: Colors.black,
+    //       width: 2.00,
+    //     ),
+    //   ),
+    //   child: Center(
+    //     child: Text(widget.value),
+    //   ),
+    // );
     return InkWell(
       onTap: (() {
-        setState(() {
-          _playTurn();
-        });
+        print('ontap');
+
+        _playTurn();
       }),
+      onTapUp: (xo) => setState(() {}),
       child: Container(
         height: 50,
         width: 50,
@@ -232,7 +257,9 @@ class _BoxState extends State<Box> {
             width: 2.00,
           ),
         ),
-        child: Center(child: SizedBox(child: Text(widget.value))),
+        child: Center(
+          child: Text(widget.value),
+        ),
       ),
     );
   }
