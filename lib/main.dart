@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  // runApp(const MyApp());
+
+  runApp(ChangeNotifierProvider(
+    create: (context) => BoxData(),
+    child: const MyApp(),
+  ));
 }
 
 int count = 1;
@@ -13,6 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Tic Tac Toe',
       theme: ThemeData(
         // This is the theme of your application.
@@ -26,7 +33,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      //home: Text('id'),
+      // home: Text('id'),
       home: const HomePage(),
     );
   }
@@ -43,18 +50,56 @@ class _HomePageState extends State<HomePage> {
   List<Box>? boxesList;
   var filledBoxes = <Box>{};
 
-  createboxList() {
+  @override
+  initState() {
     boxesList = [
-      Box(updateBox: updateBox, id: 0), //0
-      Box(updateBox: updateBox, id: 1),
-      Box(updateBox: updateBox, id: 2),
-      Box(updateBox: updateBox, id: 3),
-      Box(updateBox: updateBox, id: 4),
-      Box(updateBox: updateBox, id: 5),
-      Box(updateBox: updateBox, id: 6),
-      Box(updateBox: updateBox, id: 7),
-      Box(updateBox: updateBox, id: 8),
+      Box(
+        updateBox: updateBox,
+        id: 0,
+        key: UniqueKey(),
+      ), //0
+      Box(
+        updateBox: updateBox,
+        id: 1,
+        key: UniqueKey(),
+      ),
+      Box(
+        updateBox: updateBox,
+        id: 2,
+        key: UniqueKey(),
+      ),
+      Box(
+        updateBox: updateBox,
+        id: 3,
+        key: UniqueKey(),
+      ),
+      Box(
+        updateBox: updateBox,
+        id: 4,
+        key: UniqueKey(),
+      ),
+      Box(
+        updateBox: updateBox,
+        id: 5,
+        key: UniqueKey(),
+      ),
+      Box(
+        updateBox: updateBox,
+        id: 6,
+        key: UniqueKey(),
+      ),
+      Box(
+        updateBox: updateBox,
+        id: 7,
+        key: UniqueKey(),
+      ),
+      Box(
+        updateBox: updateBox,
+        id: 8,
+        key: UniqueKey(),
+      ),
     ];
+    super.initState();
   }
 
   check() {
@@ -83,7 +128,7 @@ class _HomePageState extends State<HomePage> {
 
     //if filled boxes contains box 12
     if (filledBoxes.contains(boxesList![1])) {
-      if (verticalCheck(boxesList![3])) return true;
+      if (verticalCheck(boxesList![1])) return true;
     }
 
     //if no pattern was found it will return false
@@ -91,26 +136,35 @@ class _HomePageState extends State<HomePage> {
   }
 
   verticalCheck(Box boxToBeChecked) {
-    if (boxesList![boxToBeChecked.id + 3] == null ||
-        boxesList![boxToBeChecked.id + 6] == null) {
-      return false;
-    }
+    // if (boxesList![boxToBeChecked.id + 3] == null ||
+    //     boxesList![boxToBeChecked.id + 6] == null) {
+    //   return false;
+    // }
     if (boxToBeChecked.value == boxesList![boxToBeChecked.id + 3].value &&
         boxToBeChecked.value == boxesList![boxToBeChecked.id + 6].value) {
       return true;
     }
+
+    return false;
   }
 
   horizontalCheck(Box boxToBeChecked) {
+    //assert(boxesList![boxToBeChecked.id + 1]);
+    // if (boxesList![boxToBeChecked.id + 1].value =='' ||
+    //     boxesList![boxToBeChecked.id + 2].value == '') {
+    //   return false;
+    // }
+
     if (boxToBeChecked.value == boxesList![boxToBeChecked.id + 1].value &&
         boxToBeChecked.value == boxesList![boxToBeChecked.id + 2].value) {
       return true;
     }
+    return false;
   }
 
   crossCheck(Box boxToBeChecked) {
     //special check for box 11
-    if (boxToBeChecked == boxesList![0]) {
+    if (boxToBeChecked.id == 0) {
       if (boxToBeChecked.value == boxesList![4].value &&
           boxToBeChecked.value == boxesList![8].value) {
         return true;
@@ -118,57 +172,58 @@ class _HomePageState extends State<HomePage> {
     }
 
     // special check for box 13
-    if (boxToBeChecked == boxesList![2]) {
+    if (boxToBeChecked.id == 2) {
       if (boxToBeChecked.value == boxesList![4].value &&
           boxToBeChecked.value == boxesList![6].value) {
         return true;
       }
     }
+    return false;
   }
 
-  String? winner = '';
-  Widget winnerStatus = Text('');
+  String? winner;
+  // Widget winnerStatus = Text(winner?'':'');
 
   updateBox(int id) {
-    setState(() {
-      if (boxesList![id].value == '') {
-        // Add it to list of filled boxes
-        filledBoxes.add(boxesList![id]);
+    //setState(() {
 
-        if (count.isOdd) {
-          boxesList![id].value = 'X';
-        } else {
-          boxesList![id].value = 'O';
-        }
+    //widget.updateBox();
+
+    // Add it to list of filled boxes
+
+    filledBoxes.add(boxesList![id]);
+    // print(count);
+
+    // check for a solution
+    if (count >= 5) {
+      if (check()) {
+        setState(() {
+          winner = count.isEven ? 'X' : 'O';
+          print('the winner is $winner');
+
+          count = 1;
+        });
+
+        //winnerStatus = Text('The Winner is $winner!!!!!');
       }
+    }
+    //advance the counter
+    //count++;
 
-      //widget.updateBox();
-
-      //advance the counter
-
-      count++;
-      print(count);
-      // check for a solution
-      if (count > 5) {
-        if (check()) {
-          winner = count.isOdd ? 'X' : 'O';
-          winnerStatus = Text('The Winner is $winner!!!!!');
-        }
-      }
-    });
+    //});
   }
 
   @override
   Widget build(BuildContext context) {
-    createboxList();
+    //createboxList();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tic Tac Toe'),
+        title: const Text('Tic Tac Toe'),
       ),
       body: Center(
         child: Container(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -184,70 +239,70 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [boxesList![6], boxesList![7], boxesList![8]],
                 ),
-                Row(children: [
-                  winnerStatus,
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Text(winner != null ? '$winner is the winner' : ''),
                 ]),
               ],
             )),
       ),
       floatingActionButton: IconButton(
-        icon: Icon(
+        icon: const Icon(
           Icons.restart_alt_outlined,
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) {
+            return const HomePage();
+          }), (route) => false);
+          // Navigator.push(context, MaterialPageRoute(builder: (context) {
+          //   return const HomePage();
+          // }));
+          Provider.of<BoxData>(context, listen: false).boxValue = [
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            ''
+          ];
+          count = 1;
+        },
       ),
     );
   }
 }
 
-// ignore: must_be_immutable
-class Box extends StatefulWidget {
-  Box({Key? key, required this.updateBox, required this.id}) : super(key: key);
+class Box extends StatelessWidget {
+  Box({Key? key, required this.id, required this.updateBox}) : super(key: key);
 
-  int id;
-  String value = '';
+  final int id;
   final Function updateBox;
+  String value = '';
 
-  @override
-  State<Box> createState() => _BoxState();
-}
-
-class _BoxState extends State<Box> {
   final iconlist = DefaultTextStyle.merge(
-      style: TextStyle(fontWeight: FontWeight.bold), child: Container());
+      style: const TextStyle(fontWeight: FontWeight.bold), child: Container());
 
   void _playTurn() {
-    //setState(() {});
-
-    widget.updateBox(widget.id);
+    updateBox(id);
+    // notifyListeners();
   }
 
   //String value = '';
 
-  bool xo = true;
-
   @override
   Widget build(BuildContext context) {
-    // return Container(
-    //   height: 50,
-    //   width: 50,
-    //   decoration: BoxDecoration(
-    //     border: Border.all(
-    //       color: Colors.black,
-    //       width: 2.00,
-    //     ),
-    //   ),
-    //   child: Center(
-    //     child: Text(widget.value),
-    //   ),
-    // );
     return InkWell(
       onTap: (() {
+        // ignore: avoid_print
         print('ontap');
 
+        Provider.of<BoxData>(context, listen: false).updateValue(id);
+        value = Provider.of<BoxData>(context, listen: false).boxValue[id];
         _playTurn();
       }),
-      onTapUp: (xo) => setState(() {}),
       child: Container(
         height: 50,
         width: 50,
@@ -258,9 +313,37 @@ class _BoxState extends State<Box> {
           ),
         ),
         child: Center(
-          child: Text(widget.value),
+          child: Consumer<BoxData>(
+            builder: (context, boxData, child) => Text(boxData.boxValue[id]),
+          ),
         ),
       ),
     );
+  }
+}
+
+class BoxData extends ChangeNotifier {
+  List<String> boxValue = [
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+  ];
+
+  void updateValue(int id) {
+    if (boxValue[id] == '') {
+      if (count.isOdd) {
+        boxValue[id] = 'X';
+      } else {
+        boxValue[id] = 'O';
+      }
+    }
+    count++;
+    notifyListeners();
   }
 }
