@@ -5,12 +5,10 @@ void main() {
   // runApp(const MyApp());
 
   runApp(ChangeNotifierProvider(
-    create: (context) => BoxData(),
+    create: (context) => BoxDataNotifier(),
     child: const MyApp(),
   ));
 }
-
-int count = 1;
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -47,88 +45,42 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Box>? boxesList;
-  var filledBoxes = <Box>{};
+  late List<Box> boxesList;
+  List<Box> filledBoxes = <Box>[];
+  int count = 0;
 
   @override
   initState() {
-    boxesList = [
-      Box(
-        updateBox: updateBox,
-        id: 0,
-        key: UniqueKey(),
-      ), //0
-      Box(
-        updateBox: updateBox,
-        id: 1,
-        key: UniqueKey(),
-      ),
-      Box(
-        updateBox: updateBox,
-        id: 2,
-        key: UniqueKey(),
-      ),
-      Box(
-        updateBox: updateBox,
-        id: 3,
-        key: UniqueKey(),
-      ),
-      Box(
-        updateBox: updateBox,
-        id: 4,
-        key: UniqueKey(),
-      ),
-      Box(
-        updateBox: updateBox,
-        id: 5,
-        key: UniqueKey(),
-      ),
-      Box(
-        updateBox: updateBox,
-        id: 6,
-        key: UniqueKey(),
-      ),
-      Box(
-        updateBox: updateBox,
-        id: 7,
-        key: UniqueKey(),
-      ),
-      Box(
-        updateBox: updateBox,
-        id: 8,
-        key: UniqueKey(),
-      ),
-    ];
     super.initState();
   }
 
   check() {
     // if filled boxes contains box 11
-    if (filledBoxes.contains(boxesList![0])) {
-      if (verticalCheck(boxesList![0])) return true;
-      if (horizontalCheck(boxesList![0])) return true;
-      if (crossCheck(boxesList![0])) return true;
+    if (boxesList[0].value != '') {
+      if (verticalCheck(boxesList[0])) return true;
+      if (horizontalCheck(boxesList[0])) return true;
+      if (crossCheck(boxesList[0])) return true;
     }
 
     // if filled boxes contains box 13
-    if (filledBoxes.contains(boxesList![2])) {
-      if (verticalCheck(boxesList![2])) return true;
-      if (crossCheck(boxesList![2])) return true;
+    if (boxesList[2].value != '') {
+      if (verticalCheck(boxesList[2])) return true;
+      if (crossCheck(boxesList[2])) return true;
     }
 
     //if filled boxes contains box 21
-    if (filledBoxes.contains(boxesList![3])) {
-      if (horizontalCheck(boxesList![3])) return true;
+    if (boxesList[3].value != '') {
+      if (horizontalCheck(boxesList[3])) return true;
     }
 
     //if filled boxes contains box 31
-    if (filledBoxes.contains(boxesList![6])) {
-      if (horizontalCheck(boxesList![6])) return true;
+    if (boxesList[6].value != '') {
+      if (horizontalCheck(boxesList[6])) return true;
     }
 
     //if filled boxes contains box 12
-    if (filledBoxes.contains(boxesList![1])) {
-      if (verticalCheck(boxesList![1])) return true;
+    if (boxesList[1].value != '') {
+      if (verticalCheck(boxesList[1])) return true;
     }
 
     //if no pattern was found it will return false
@@ -140,8 +92,8 @@ class _HomePageState extends State<HomePage> {
     //     boxesList![boxToBeChecked.id + 6] == null) {
     //   return false;
     // }
-    if (boxToBeChecked.value == boxesList![boxToBeChecked.id + 3].value &&
-        boxToBeChecked.value == boxesList![boxToBeChecked.id + 6].value) {
+    if (boxToBeChecked.value == boxesList[boxToBeChecked.id + 3].value &&
+        boxToBeChecked.value == boxesList[boxToBeChecked.id + 6].value) {
       return true;
     }
 
@@ -155,8 +107,8 @@ class _HomePageState extends State<HomePage> {
     //   return false;
     // }
 
-    if (boxToBeChecked.value == boxesList![boxToBeChecked.id + 1].value &&
-        boxToBeChecked.value == boxesList![boxToBeChecked.id + 2].value) {
+    if (boxToBeChecked.value == boxesList[boxToBeChecked.id + 1].value &&
+        boxToBeChecked.value == boxesList[boxToBeChecked.id + 2].value) {
       return true;
     }
     return false;
@@ -165,16 +117,16 @@ class _HomePageState extends State<HomePage> {
   crossCheck(Box boxToBeChecked) {
     //special check for box 11
     if (boxToBeChecked.id == 0) {
-      if (boxToBeChecked.value == boxesList![4].value &&
-          boxToBeChecked.value == boxesList![8].value) {
+      if (boxToBeChecked.value == boxesList[4].value &&
+          boxToBeChecked.value == boxesList[8].value) {
         return true;
       }
     }
 
     // special check for box 13
     if (boxToBeChecked.id == 2) {
-      if (boxToBeChecked.value == boxesList![4].value &&
-          boxToBeChecked.value == boxesList![6].value) {
+      if (boxToBeChecked.value == boxesList[4].value &&
+          boxToBeChecked.value == boxesList[6].value) {
         return true;
       }
     }
@@ -184,21 +136,16 @@ class _HomePageState extends State<HomePage> {
   String? winner;
   // Widget winnerStatus = Text(winner?'':'');
 
-  updateBox(int id) {
-    //setState(() {
-
-    //widget.updateBox();
-
-    // Add it to list of filled boxes
-
-    filledBoxes.add(boxesList![id]);
-    // print(count);
+  updateGame(int id) {
+    boxesList[id].value =
+        Provider.of<BoxDataNotifier>(context, listen: false).boxValue[id];
+    filledBoxes.add(boxesList[id]);
 
     // check for a solution
     if (count >= 5) {
       if (check()) {
         setState(() {
-          winner = count.isEven ? 'X' : 'O';
+          winner = count.isOdd ? 'X' : 'O';
           print('the winner is $winner');
 
           count = 1;
@@ -213,10 +160,60 @@ class _HomePageState extends State<HomePage> {
     //});
   }
 
+  createBoxList() {
+    boxesList = [
+      Box(
+        updateGame: updateGame,
+        id: 0,
+        value: Provider.of<BoxDataNotifier>(context).getBoxValue(0),
+      ), //0
+      Box(
+        updateGame: updateGame,
+        id: 1,
+        value: Provider.of<BoxDataNotifier>(context).getBoxValue(1),
+      ),
+      Box(
+        updateGame: updateGame,
+        id: 2,
+        value: Provider.of<BoxDataNotifier>(context).getBoxValue(2),
+      ),
+      Box(
+        updateGame: updateGame,
+        id: 3,
+        value: Provider.of<BoxDataNotifier>(context).getBoxValue(3),
+      ),
+      Box(
+        updateGame: updateGame,
+        id: 4,
+        value: Provider.of<BoxDataNotifier>(context).getBoxValue(4),
+      ),
+      Box(
+        updateGame: updateGame,
+        id: 5,
+        value: Provider.of<BoxDataNotifier>(context).getBoxValue(5),
+      ),
+      Box(
+        updateGame: updateGame,
+        id: 6,
+        value: Provider.of<BoxDataNotifier>(context).getBoxValue(6),
+      ),
+      Box(
+        updateGame: updateGame,
+        id: 7,
+        value: Provider.of<BoxDataNotifier>(context).getBoxValue(7),
+      ),
+      Box(
+        updateGame: updateGame,
+        id: 8,
+        value: Provider.of<BoxDataNotifier>(context).getBoxValue(8),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
-    //createboxList();
-
+    createBoxList();
+    count = Provider.of<BoxDataNotifier>(context).count;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tic Tac Toe'),
@@ -229,15 +226,15 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [boxesList![0], boxesList![1], boxesList![2]],
+                  children: [boxesList[0], boxesList[1], boxesList[2]],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [boxesList![3], boxesList![4], boxesList![5]],
+                  children: [boxesList[3], boxesList[4], boxesList[5]],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [boxesList![6], boxesList![7], boxesList![8]],
+                  children: [boxesList[6], boxesList[7], boxesList[8]],
                 ),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Text(winner != null ? '$winner is the winner' : ''),
@@ -250,57 +247,52 @@ class _HomePageState extends State<HomePage> {
           Icons.restart_alt_outlined,
         ),
         onPressed: () {
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) {
-            return const HomePage();
-          }), (route) => false);
-          // Navigator.push(context, MaterialPageRoute(builder: (context) {
-          //   return const HomePage();
-          // }));
-          Provider.of<BoxData>(context, listen: false).boxValue = [
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            ''
-          ];
-          count = 1;
+          Provider.of<BoxDataNotifier>(context, listen: false).restartGame();
         },
       ),
     );
   }
 }
 
-class Box extends StatelessWidget {
-  Box({Key? key, required this.id, required this.updateBox}) : super(key: key);
+class Box extends StatefulWidget {
+  Box({
+    Key? key,
+    required this.id,
+    required this.updateGame,
+    required this.value,
+  }) : super(key: key);
 
   final int id;
-  final Function updateBox;
+  final Function updateGame;
+  String value = '';
+
+  //value = Provider.of<BoxDataNotifier>(context, listen: false).getBoxValue(id);
+
+  @override
+  State<Box> createState() => _BoxState();
+}
+
+class _BoxState extends State<Box> {
   String value = '';
 
   final iconlist = DefaultTextStyle.merge(
       style: const TextStyle(fontWeight: FontWeight.bold), child: Container());
 
   void _playTurn() {
-    updateBox(id);
-    // notifyListeners();
+    Provider.of<BoxDataNotifier>(context, listen: false).updateValue(widget.id);
+    Provider.of<BoxDataNotifier>(context, listen: false).incrementCounter();
+    widget.updateGame(widget.id);
   }
-
-  //String value = '';
 
   @override
   Widget build(BuildContext context) {
+    value = Provider.of<BoxDataNotifier>(context).getBoxValue(widget.id);
     return InkWell(
       onTap: (() {
-        // ignore: avoid_print
-        print('ontap');
+        if (value != '') {
+          return;
+        }
 
-        Provider.of<BoxData>(context, listen: false).updateValue(id);
-        value = Provider.of<BoxData>(context, listen: false).boxValue[id];
         _playTurn();
       }),
       child: Container(
@@ -313,16 +305,15 @@ class Box extends StatelessWidget {
           ),
         ),
         child: Center(
-          child: Consumer<BoxData>(
-            builder: (context, boxData, child) => Text(boxData.boxValue[id]),
-          ),
+          child: Text(value),
         ),
       ),
     );
   }
 }
 
-class BoxData extends ChangeNotifier {
+class BoxDataNotifier extends ChangeNotifier {
+  int count = 1;
   List<String> boxValue = [
     '',
     '',
@@ -343,7 +334,28 @@ class BoxData extends ChangeNotifier {
         boxValue[id] = 'O';
       }
     }
-    count++;
+
     notifyListeners();
   }
+
+  void incrementCounter() {
+    count++;
+  }
+
+  void restartGame() {
+    boxValue = [
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ];
+    notifyListeners();
+  }
+
+  String getBoxValue(int boxId) => boxValue[boxId];
 }
