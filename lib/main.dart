@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  // runApp(const MyApp());
-
   runApp(ChangeNotifierProvider(
     create: (context) => BoxDataNotifier(),
     child: const MyApp(),
@@ -13,25 +11,14 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Tic Tac Toe',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      // home: Text('id'),
       home: const HomePage(),
     );
   }
@@ -48,6 +35,7 @@ class _HomePageState extends State<HomePage> {
   late List<Box> boxesList;
   List<Box> filledBoxes = <Box>[];
   int count = 0;
+  String? winner;
 
   @override
   initState() {
@@ -55,43 +43,39 @@ class _HomePageState extends State<HomePage> {
   }
 
   check() {
-    // if filled boxes contains box 11
+    // check for  box 1,1
     if (boxesList[0].value != '') {
       if (verticalCheck(boxesList[0])) return true;
       if (horizontalCheck(boxesList[0])) return true;
       if (crossCheck(boxesList[0])) return true;
     }
 
-    // if filled boxes contains box 13
+    // check for  box 1,3
     if (boxesList[2].value != '') {
       if (verticalCheck(boxesList[2])) return true;
       if (crossCheck(boxesList[2])) return true;
     }
 
-    //if filled boxes contains box 21
+    //check for  box 2,1
     if (boxesList[3].value != '') {
       if (horizontalCheck(boxesList[3])) return true;
     }
 
-    //if filled boxes contains box 31
+    //check for  box 3,1
     if (boxesList[6].value != '') {
       if (horizontalCheck(boxesList[6])) return true;
     }
 
-    //if filled boxes contains box 12
+    //check for  box 1,2
     if (boxesList[1].value != '') {
       if (verticalCheck(boxesList[1])) return true;
     }
 
-    //if no pattern was found it will return false
+    //if none of the patterns were found return false
     return false;
   }
 
   verticalCheck(Box boxToBeChecked) {
-    // if (boxesList![boxToBeChecked.id + 3] == null ||
-    //     boxesList![boxToBeChecked.id + 6] == null) {
-    //   return false;
-    // }
     if (boxToBeChecked.value == boxesList[boxToBeChecked.id + 3].value &&
         boxToBeChecked.value == boxesList[boxToBeChecked.id + 6].value) {
       return true;
@@ -101,12 +85,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   horizontalCheck(Box boxToBeChecked) {
-    //assert(boxesList![boxToBeChecked.id + 1]);
-    // if (boxesList![boxToBeChecked.id + 1].value =='' ||
-    //     boxesList![boxToBeChecked.id + 2].value == '') {
-    //   return false;
-    // }
-
     if (boxToBeChecked.value == boxesList[boxToBeChecked.id + 1].value &&
         boxToBeChecked.value == boxesList[boxToBeChecked.id + 2].value) {
       return true;
@@ -133,9 +111,6 @@ class _HomePageState extends State<HomePage> {
     return false;
   }
 
-  String? winner;
-  // Widget winnerStatus = Text(winner?'':'');
-
   updateGame(int id) {
     boxesList[id].value =
         Provider.of<BoxDataNotifier>(context, listen: false).boxValue[id];
@@ -145,19 +120,13 @@ class _HomePageState extends State<HomePage> {
     if (count >= 5) {
       if (check()) {
         setState(() {
-          winner = count.isOdd ? 'X' : 'O';
-          print('the winner is $winner');
+          Provider.of<BoxDataNotifier>(context, listen: false).winner =
+              count.isOdd ? 'X' : 'O';
 
           count = 1;
         });
-
-        //winnerStatus = Text('The Winner is $winner!!!!!');
       }
     }
-    //advance the counter
-    //count++;
-
-    //});
   }
 
   createBoxList() {
@@ -166,7 +135,7 @@ class _HomePageState extends State<HomePage> {
         updateGame: updateGame,
         id: 0,
         value: Provider.of<BoxDataNotifier>(context).getBoxValue(0),
-      ), //0
+      ),
       Box(
         updateGame: updateGame,
         id: 1,
@@ -212,8 +181,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    winner = Provider.of<BoxDataNotifier>(context).winner;
     createBoxList();
     count = Provider.of<BoxDataNotifier>(context).count;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tic Tac Toe'),
@@ -247,6 +218,7 @@ class _HomePageState extends State<HomePage> {
           Icons.restart_alt_outlined,
         ),
         onPressed: () {
+          Provider.of<BoxDataNotifier>(context, listen: false).winner = null;
           Provider.of<BoxDataNotifier>(context, listen: false).restartGame();
         },
       ),
@@ -254,6 +226,7 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+// ignore: must_be_immutable
 class Box extends StatefulWidget {
   Box({
     Key? key,
@@ -265,8 +238,6 @@ class Box extends StatefulWidget {
   final int id;
   final Function updateGame;
   String value = '';
-
-  //value = Provider.of<BoxDataNotifier>(context, listen: false).getBoxValue(id);
 
   @override
   State<Box> createState() => _BoxState();
@@ -289,11 +260,13 @@ class _BoxState extends State<Box> {
     value = Provider.of<BoxDataNotifier>(context).getBoxValue(widget.id);
     return InkWell(
       onTap: (() {
-        if (value != '') {
-          return;
+        if (value == '' &&
+            Provider.of<BoxDataNotifier>(context, listen: false).winner ==
+                null) {
+          _playTurn();
         }
 
-        _playTurn();
+        return;
       }),
       child: Container(
         height: 50,
@@ -314,6 +287,7 @@ class _BoxState extends State<Box> {
 
 class BoxDataNotifier extends ChangeNotifier {
   int count = 1;
+  String? winner;
   List<String> boxValue = [
     '',
     '',
@@ -354,6 +328,7 @@ class BoxDataNotifier extends ChangeNotifier {
       '',
       '',
     ];
+    count = 1;
     notifyListeners();
   }
 
